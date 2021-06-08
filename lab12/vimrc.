@@ -1,0 +1,129 @@
+" lozchkavarene "
+"""""""""""""""""
+
+set nocompatible
+call plug#begin('~/.vim/plugged')
+
+Plug 'preservim/nerdtree'
+Plug 'majutsushi/tagbar'
+" Nature " 
+Plug 'bluz71/vim-nightfly-guicolors'
+
+call plug#end()
+
+set t_Co=256                " Enable 256 colors
+set termguicolors           " Enable GUI colors for the terminal to get truecolor
+colorscheme nightfly
+
+syntax on
+set nu
+set background=dark
+set encoding=utf-8
+set clipboard=unnamedplus
+set tabstop=4
+set softtabstop=4
+set shiftwidth=4
+set smartindent
+set expandtab
+set shortmess=a
+set t_vb=                   " flashing of a screen
+filetype on
+
+augroup cpp
+    autocmd! 
+"    autocmd BufWinEnter *.cpp :TagbarToggle
+    autocmd BufWinEnter *.cpp :ALEToggleBuffer
+augroup END
+
+" autocmd BufWinEnter *.html :set omnifunc=htmlcomplete#CompleteTags
+" autocmd BufWinEnter *.js :set omnifunc=javascriptcompete#CompleteJS
+" autocmd BufWinEnter *.css :set omnifunc=csscomplete#CompleteCSS
+
+nnoremap <silent> <F12> :TagbarToggle<CR>
+nnoremap <silent> <C-]> :TagbarOpen -j <CR>
+nnoremap <silent> <F2> :NERDTreeToggle<CR>
+nnoremap <F3> :ALEToggleBuffer <CR> 
+nnoremap @html :call Html() <CR>
+nnoremap @cmake :call CMake() <CR>
+nnoremap @cron :call Cron() <CR>
+nnoremap <Left> <C-w><Left>
+nnoremap <Right> <C-w><Right>
+nnoremap <Up> <C-w><Up>
+nnoremap <Down> <C-w><Down>
+
+hi TagbarHighlight cterm=underline ctermbg=234 ctermfg=252
+
+func! Cron()
+
+    exec ':r ~/.snippets/cron'
+    exec '1'
+    exec 'delete'
+
+endfunc
+
+func! CMake()
+
+    exec ':r ~/.snippets/cmake'
+    exec '1'
+    exec 'delete'
+
+endfunc
+
+func! Html()
+
+    exec ':r ~/.snippets/html'
+    exec '1'
+    exec 'delete'
+    exec '9'
+
+endfunc
+
+nnoremap <F5> :call Compile_run() <CR>
+func! Compile_run()
+    
+    exec 'w'
+    if (&filetype == 'python')
+        exec '!python3 %'
+    else
+        if filereadable("Makefile")
+            exec '!make'
+            exec '!./a.out'
+        else 
+            exec '!g++ -Wall -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC % -o a.out'
+            "exec '!g++ % -o a.out'
+            exec '!./a.out'
+        endif
+    endif
+
+endfunc
+
+nnoremap <F6> :call Gdb() <CR> <CR>
+func! Gdb()
+
+    exec 'w'
+    if filereadable("Makefile")
+        exec '!make'
+        exec '!gdb -tui a.out'
+    else 
+        exec '!g++ -Wall -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -g % -o a.out'
+        "exec '!g++ % -o a.out -g'
+        exec '!gdb -tui a.out'
+    endif
+
+endfunc
+
+
+let g:airline_section_warning = 0
+let g:ale_lint_on_text_changed = 1
+let b:ale_enabled = 0
+let g:nightflyUnderlineMatchParen = 1
+let g:SuperTabDefaultCompletionType = "<C-X><C-O>"
+
+let g:tokyonight_style = 'storm' " available: night, storm
+let g:tokyonight_enable_italic = 1
+
+
+" hi ALEErrorSign ctermbg=234 ctermfg=15
+" hi ALEWarningSign ctermbg=234 ctermfg=15
+" hi ALEVirtualTextError ctermfg=125 guifg=#cc517a
+" hi ALEVirtualTextWarning ctermfg=130 guifg=#c57339
